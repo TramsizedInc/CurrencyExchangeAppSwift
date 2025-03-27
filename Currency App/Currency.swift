@@ -10,10 +10,7 @@ import Alamofire
 
 
 struct Currency: Codable {
-    var success: Bool
-    var base: String
-    var date: String
-    var rates = [String: Double]()
+    var data = [String: Double]()
 }
 
 func apiRequest(url: String, completion: @escaping (Currency) -> ()) {

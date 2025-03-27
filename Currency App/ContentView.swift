@@ -10,22 +10,37 @@ import Alamofire
 
 struct ContentView: View {
     @State var currencyList = [String]()
-    @State var input = "100"
-    @State var base = "USD"
+    @State var input = "1000"
+    @State var base = "HUF"
     @FocusState private var inputIsFocused: Bool
     
-    func makeRequest(showAll: Bool, currencies: [String] = ["USD", "GBP", "EUR"]) {
-        apiRequest(url: "https://api.exchangerate.host/latest?base=\(base)&amount=\(input)") { currency in
+    //"https://api.exchangerate.host/latest?base=\(base)&amount=\(input)"
+    func makeRequest(showAll: Bool, currencies: [String] = ["USD", "GBP", "EUR", "CHF","BGN","JPY","CZK","GBP",]) {
+        apiRequest(url:"https://api.freecurrencyapi.com/v1/latest?apikey=fca_live_TlsIHGFiUp3LqNSgG9ZFRKmtnHgWmqbB7Gw5iGrG&currencies=EUR%2CUSD%2CCAD%2CCHF&base_currency=\(base)") { currency in
             //print("ContentView", currency.rates)
             var tempList = [String]()
             
-            for currency in currency.rates {
+            for currency in currency.data {
                 
                 if showAll {
-                    tempList.append("\(currency.key) \(String(format: "%.2f",currency.value))")
+                    tempList.append("\(currency.key) \(String(format: "%.7f",currency.value))")
                 } else if currencies.contains(currency.key)  {
-                    tempList.append("\(currency.key) \(String(format: "%.2f",currency.value))")
+                    tempList.append("\(currency.key) \(String(format: "%.7f",currency.value))")
                 }
+                tempList.sort()
+            }
+            currencyList.self = tempList
+            
+        }
+    }
+    
+    func makeConversion(){
+        apiRequest(url:"https://api.freecurrencyapi.com/v1/latest?apikey=fca_live_TlsIHGFiUp3LqNSgG9ZFRKmtnHgWmqbB7Gw5iGrG&currencies=EUR%2CUSD%2CCAD%2CCHF&base_currency=\(base)") { currency in
+            //print("ContentView", currency.rates)
+            var tempList = [String]()
+            
+            for currency in currency.data {
+                tempList.append("\(currency.key) \(String(format: "%.7f", Double(currency.value)*Double(input)!))")
                 tempList.sort()
             }
             currencyList.self = tempList
@@ -69,7 +84,7 @@ struct ContentView: View {
                     .padding()
                     .focused($inputIsFocused)
                 Button("Convert!") {
-                    makeRequest(showAll: true)
+                    makeConversion()
                     inputIsFocused = false
                 }.padding()
             }
